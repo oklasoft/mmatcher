@@ -5,19 +5,33 @@ type Record struct {
 	Atts []Atter
 }
 
-func (a *Record) Matches(b *Record, atts ...int) bool {
-	if len(atts) <= 0 {
-		atts = make([]int, len(a.Atts))
-		for i := range atts {
-			atts[i] = i
+func (a *Record) Matches(b *Record, positions ...int) bool {
+	if len(positions) <= 0 {
+		positions = make([]int, len(a.Atts))
+		for i := range positions {
+			positions[i] = i
 		}
 	}
-	matches := make([]bool, len(atts))
-	for i, n := range atts {
+	e := make([]Atter, len(a.Atts))
+	return a.MatchesRanges(b, e, positions...)
+}
+
+func (a *Record) MatchesRanges(b *Record, e []Atter, positions ...int) bool {
+	if len(a.Atts) != len(b.Atts) || len(e) != len(a.Atts) {
+		return false
+	}
+	if len(positions) <= 0 {
+		positions = make([]int, len(a.Atts))
+		for i := range positions {
+			positions[i] = i
+		}
+	}
+	matches := make([]bool, len(positions))
+	for i, n := range positions {
 		if n >= len(a.Atts) || i >= len(b.Atts) {
 			return false
 		}
-		matches[i] = a.matchesAtt(b, NumericAtt{}, n)
+		matches[i] = a.matchesAtt(b, e[i], n)
 	}
 	for _, m := range matches {
 		if !m {
