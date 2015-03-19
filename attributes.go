@@ -27,8 +27,7 @@ func (a NumericAtt) Equal(b Atter, e Atter) bool {
 	if !ok {
 		return false
 	}
-	var epsilon NumericAtt
-	epsilon, ok = e.(NumericAtt)
+	epsilon, ok := e.(NumericAtt)
 	if ok && epsilon.Val > 0 {
 		return math.Abs(math.Abs(a.Val)-math.Abs(v.Val)) <= epsilon.Val
 	}
