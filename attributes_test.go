@@ -1,6 +1,7 @@
-package mmatcher
+package mmatcher_test
 
 import "testing"
+import . "github.com/oklasoft/mmatcher"
 
 func TestTextAttsEqual(t *testing.T) {
 	ta := TextAtt{"hi"}
