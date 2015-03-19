@@ -28,10 +28,10 @@ func (a *Record) MatchesRanges(b *Record, e []Atter, positions ...int) bool {
 	}
 	matches := make([]bool, len(positions))
 	for i, n := range positions {
-		if n >= len(a.Atts) || i >= len(b.Atts) {
+		if n >= len(a.Atts) {
 			return false
 		}
-		matches[i] = a.matchesAtt(b, e[i], n)
+		matches[i] = a.matchesAtt(b, e[n], n)
 	}
 	for _, m := range matches {
 		if !m {
