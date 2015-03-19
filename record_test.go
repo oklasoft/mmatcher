@@ -95,7 +95,7 @@ func TestMatchRange(t *testing.T) {
 	}
 }
 
-func TestMatches(t *testing.T) {
+func TestMatchesAll(t *testing.T) {
 	a := Records{
 		Record{Id: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
 		Record{Id: "a2", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
@@ -111,10 +111,10 @@ func TestMatches(t *testing.T) {
 		Record{Id: "b7", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
 	}
 
-	if m := a[0].Matches(b); len(m) != 0 {
+	if m := a[0].MatchesAll(b); len(m) != 0 {
 		t.Errorf("%v should not have found any matches in %v", a[0], b)
 	}
-	m := a[2].Matches(b)
+	m := a[2].MatchesAll(b)
 	if len(m) != 1 {
 		t.Errorf("%v should have found one match in %v, but found %v", a[2], b, m)
 	}
@@ -122,7 +122,7 @@ func TestMatches(t *testing.T) {
 		t.Errorf("%v should have found one at 1, but found it at %v", a[2], m[0])
 	}
 
-	m = a[1].Matches(b)
+	m = a[1].MatchesAll(b)
 	if len(m) != 2 {
 		t.Errorf("%v should have found two matches in %v, but found %v", a[1], b, m)
 	}
@@ -131,16 +131,86 @@ func TestMatches(t *testing.T) {
 	}
 
 	e := []Atter{TextAtt{}, NumericAtt{5}}
-	m = a[0].Matches(b, e...)
+	m = a[0].MatchesAll(b, e...)
 	if 0 != len(m) {
 		t.Errorf("%v should not have found any matches in %v using %v", a[0], b, e)
 	}
-	m = a[1].Matches(b, e...)
+	m = a[1].MatchesAll(b, e...)
 	if 3 != len(m) {
 		t.Errorf("%v should have found 3 in %v using %v, but found %v", a[0], b, e, m)
 	}
-	m = a[2].Matches(b, e...)
+	m = a[2].MatchesAll(b, e...)
 	if 2 != len(m) {
 		t.Errorf("%v should have found 2 in %v using %v, but found %v", a[0], b, e, m)
+	}
+}
+
+func TestMatchesColumns(t *testing.T) {
+	a := Records{
+		Record{Id: "a0", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
+		Record{Id: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{Id: "a2", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+	}
+	b := Records{
+		Record{Id: "b0", Atts: []Atter{TextAtt{"green"}, NumericAtt{5}}},
+		Record{Id: "b1", Atts: []Atter{TextAtt{"red"}, NumericAtt{25}}},
+		Record{Id: "b2", Atts: []Atter{TextAtt{"red"}, NumericAtt{35}}},
+		Record{Id: "b3", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+		Record{Id: "b4", Atts: []Atter{TextAtt{"green"}, NumericAtt{31}}},
+		Record{Id: "b5", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{Id: "b6", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+	}
+
+	c := []int{10}
+	if m := a[0].Matches(b, c); len(m) != 0 {
+		t.Errorf("%v should have found 0 matches using column %v in %v, instead found %v", a[0], c, b, m)
+	}
+
+	c = []int{0}
+	if m := a[0].Matches(b, c); len(m) != 4 {
+		t.Errorf("%v should have found 4 matches in %v, instead found %v", a[0], b, m)
+	}
+	m := a[2].Matches(b, c)
+	if len(m) != 3 {
+		t.Errorf("%v should have found 3 matches in %v, but found %v", a[2], b, m)
+	}
+	if 0 != m[0] {
+		t.Errorf("%v should have found one at 1, but found it at %v", a[2], m[0])
+	}
+	if 3 != m[1] {
+		t.Errorf("%v should have found one at 1, but found it at %v", a[2], m[1])
+	}
+	if 4 != m[2] {
+		t.Errorf("%v should have found one at 1, but found it at %v", a[2], m[2])
+	}
+	c = []int{1}
+	m = a[2].Matches(b, c)
+	if len(m) != 1 {
+		t.Errorf("%v should have found 1 matches in %v, but found %v", a[2], b, m)
+	}
+	if 3 != m[0] {
+		t.Errorf("%v should have found one at 1, but found it at %v", a[2], m[0])
+	}
+
+	m = a[1].Matches(b, c)
+	if len(m) != 2 {
+		t.Errorf("%v should have found two matches in %v, but found %v", a[1], b, m)
+	}
+	if 5 != m[0] && 6 != m[1] {
+		t.Errorf("%v should have found one at 5 & 6, but found it at %v", a[1], m)
+	}
+
+	e := []Atter{TextAtt{}, NumericAtt{5}}
+	m = a[0].Matches(b, c, e...)
+	if 1 != len(m) {
+		t.Errorf("%v should have found 1 matches in %v using %v, but found %v", a[0], b, e)
+	}
+	m = a[1].Matches(b, c, e...)
+	if 3 != len(m) {
+		t.Errorf("%v should have found 3 in %v using %v, but found %v", a[0], b, e, m)
+	}
+	m = a[2].Matches(b, c, e...)
+	if 4 != len(m) {
+		t.Errorf("%v should have found 4 in %v using %v, but found %v", a[0], b, e, m)
 	}
 }

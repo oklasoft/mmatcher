@@ -50,12 +50,20 @@ func (a *Record) isMatchAt(b *Record, e Atter, i int) bool {
 
 type Records []Record
 
-func (a *Record) Matches(r Records, e ...Atter) (matches []int) {
+func (a *Record) MatchesAll(r Records, e ...Atter) []int {
+	positions := make([]int, len(a.Atts))
+	for i := range a.Atts {
+		positions[i] = i
+	}
+	return a.Matches(r, positions, e...)
+}
+
+func (a *Record) Matches(r Records, positions []int, e ...Atter) (matches []int) {
 	if len(e) <= 0 {
 		e = make([]Atter, len(a.Atts))
 	}
 	for i, b := range r {
-		if a.IsMatchWithRanges(&b, e) {
+		if a.IsMatchWithRanges(&b, e, positions...) {
 			matches = append(matches, i)
 		}
 	}
