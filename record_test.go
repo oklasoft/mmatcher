@@ -94,3 +94,24 @@ func TestMatchRange(t *testing.T) {
 		t.Errorf("A:%v should match b:%v with small range:%v on %v", a, b, e, i)
 	}
 }
+
+func TestMatches(t *testing.T) {
+	a := Records{
+		Record{Id: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
+		Record{Id: "a2", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{Id: "a3", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+	}
+	b := Records{
+		Record{Id: "b1", Atts: []Atter{TextAtt{"green"}, NumericAtt{5}}},
+		Record{Id: "b2", Atts: []Atter{TextAtt{"red"}, NumericAtt{25}}},
+		Record{Id: "b3", Atts: []Atter{TextAtt{"red"}, NumericAtt{35}}},
+		Record{Id: "b4", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+	}
+	if m := a[0].Matches(b); len(m) != 0 {
+		t.Errorf("%v should not have found any matches in %v", a[0], b)
+	}
+	m := a[2].Matches(b)
+	if len(m) != 1 {
+		t.Errorf("%v should have found one match in %v", a[2], b)
+	}
+}
