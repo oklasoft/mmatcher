@@ -1,6 +1,7 @@
 package mmatcher_test
 
 import "testing"
+
 import . "github.com/oklasoft/mmatcher"
 
 func TestTextAttsEqual(t *testing.T) {
@@ -28,6 +29,9 @@ func TestNumericAttsEqual(t *testing.T) {
 	}
 	if !n1.Equal(n1, NumericAtt{1}) {
 		t.Error("NumericAtt expected to equal itself with epsilon")
+	}
+	if n1.Equal(TextAtt{"fail city"}, NumericAtt{}) {
+		t.Error("NumericAtt should not equal non NumericAtt{}")
 	}
 	n2 := NumericAtt{10.0}
 	if n1.Equal(n2, NumericAtt{}) {
