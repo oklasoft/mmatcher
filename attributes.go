@@ -9,23 +9,30 @@ import (
 	"math"
 )
 
+// Atter is the interface to wrap comparing for equality between
+// possible mixed string & numerics
 type Atter interface {
 	Equal(Atter, Atter) bool
 }
 
+// A TextAtt is to store & compare string values for a Record
 type TextAtt struct {
 	Val string
 }
 
+// A NumericAtt is to store & compare number values for a Record
 type NumericAtt struct {
 	Val float64
 }
 
+// Equal returns true if strings a & b are in fact equal, e is ignored
 func (a TextAtt) Equal(b Atter, e Atter) bool {
 	v, ok := b.(TextAtt)
 	return ok && a.Val == v.Val
 }
 
+// Equal returns true if numbers a & b are equal or within e (if e is NumericAtt)
+// If e is not a NumericAtt, just a & b are compared for equality
 func (a NumericAtt) Equal(b Atter, e Atter) bool {
 	v, ok := b.(NumericAtt)
 	if !ok {
