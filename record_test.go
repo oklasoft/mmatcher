@@ -62,6 +62,26 @@ func TestMatchAtt(t *testing.T) {
 	}
 }
 
+func TestMatchWrongSizes(t *testing.T) {
+	a := &Record{Id: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}}}
+	b := &Record{Id: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
+	if a.IsMatchWithRanges(b, make([]Atter, len(a.Atts))) {
+		t.Error("A longer record should not match a shorter record")
+	}
+	if a.IsMatchWithRanges(a, make([]Atter, 0)) {
+		t.Error("A record cannot match itself is the []range is too short")
+	}
+	if !a.IsMatchWithRanges(a, make([]Atter, len(a.Atts))) {
+		t.Error("A record should match itself completely")
+	}
+	if a.isMatchAt(a, TextAtt{}, len(a.Atts)+1) {
+		t.Error("A record cannot equal even itself at a position past the record")
+	}
+	if a.isMatchAt(a, TextAtt{}, -1) {
+		t.Error("A record cannot equal even itself at a position before the record")
+	}
+}
+
 func TestMatchRange(t *testing.T) {
 	a := &Record{Id: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}, NumericAtt{8}, TextAtt{"yes"}}}
 	b := &Record{Id: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
