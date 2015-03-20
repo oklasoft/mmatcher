@@ -42,7 +42,7 @@ func (a *Record) IsMatchWithRanges(b *Record, e []Atter, positions ...int) bool 
 }
 
 func (a *Record) isMatchAt(b *Record, e Atter, i int) bool {
-	if i < len(a.Atts) && i < len(b.Atts) {
+	if i >= 0 && i < len(a.Atts) && i < len(b.Atts) {
 		return a.Atts[i].Equal(b.Atts[i], e)
 	}
 	return false
