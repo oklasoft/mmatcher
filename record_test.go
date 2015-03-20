@@ -7,8 +7,8 @@ package mmatcher
 import "testing"
 
 func TestMatch(t *testing.T) {
-	a := &Record{Id: "a", Atts: []Atter{TextAtt{"text"}, NumericAtt{1}, TextAtt{"green"}}}
-	b := &Record{Id: "b", Atts: []Atter{TextAtt{"text"}, NumericAtt{1}, TextAtt{"red"}}}
+	a := &Record{ID: "a", Atts: []Atter{TextAtt{"text"}, NumericAtt{1}, TextAtt{"green"}}}
+	b := &Record{ID: "b", Atts: []Atter{TextAtt{"text"}, NumericAtt{1}, TextAtt{"red"}}}
 	if a.IsMatch(b) {
 		t.Error("A should not match b on all attributes")
 	}
@@ -33,8 +33,8 @@ func TestMatch(t *testing.T) {
 }
 
 func TestMatchAtt(t *testing.T) {
-	a := &Record{Id: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}, NumericAtt{8}, TextAtt{"yes"}}}
-	b := &Record{Id: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
+	a := &Record{ID: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}, NumericAtt{8}, TextAtt{"yes"}}}
+	b := &Record{ID: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
 	if !a.isMatchAt(b, NumericAtt{4}, 1) {
 		t.Error("A numeric att should match b with an epsilon")
 	}
@@ -67,8 +67,8 @@ func TestMatchAtt(t *testing.T) {
 }
 
 func TestMatchWrongSizes(t *testing.T) {
-	a := &Record{Id: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}}}
-	b := &Record{Id: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
+	a := &Record{ID: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}}}
+	b := &Record{ID: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
 	if a.IsMatchWithRanges(b, make([]Atter, len(a.Atts))) {
 		t.Error("A longer record should not match a shorter record")
 	}
@@ -87,8 +87,8 @@ func TestMatchWrongSizes(t *testing.T) {
 }
 
 func TestMatchRange(t *testing.T) {
-	a := &Record{Id: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}, NumericAtt{8}, TextAtt{"yes"}}}
-	b := &Record{Id: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
+	a := &Record{ID: "a", Atts: []Atter{TextAtt{"first"}, NumericAtt{1}, NumericAtt{8}, TextAtt{"yes"}}}
+	b := &Record{ID: "b", Atts: []Atter{TextAtt{"second"}, NumericAtt{4.2}, NumericAtt{8}, TextAtt{"yes"}}}
 	if a.IsMatch(b) {
 		t.Error("A and b should not match")
 	}
@@ -121,18 +121,18 @@ func TestMatchRange(t *testing.T) {
 
 func TestMatchesAll(t *testing.T) {
 	a := Records{
-		Record{Id: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
-		Record{Id: "a2", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
-		Record{Id: "a3", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+		Record{ID: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
+		Record{ID: "a2", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{ID: "a3", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
 	}
 	b := Records{
-		Record{Id: "b1", Atts: []Atter{TextAtt{"green"}, NumericAtt{5}}},
-		Record{Id: "b2", Atts: []Atter{TextAtt{"red"}, NumericAtt{25}}},
-		Record{Id: "b3", Atts: []Atter{TextAtt{"red"}, NumericAtt{35}}},
-		Record{Id: "b4", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
-		Record{Id: "b5", Atts: []Atter{TextAtt{"green"}, NumericAtt{31}}},
-		Record{Id: "b6", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
-		Record{Id: "b7", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{ID: "b1", Atts: []Atter{TextAtt{"green"}, NumericAtt{5}}},
+		Record{ID: "b2", Atts: []Atter{TextAtt{"red"}, NumericAtt{25}}},
+		Record{ID: "b3", Atts: []Atter{TextAtt{"red"}, NumericAtt{35}}},
+		Record{ID: "b4", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+		Record{ID: "b5", Atts: []Atter{TextAtt{"green"}, NumericAtt{31}}},
+		Record{ID: "b6", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{ID: "b7", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
 	}
 
 	if m := a[0].MatchesAll(b); len(m) != 0 {
@@ -171,18 +171,18 @@ func TestMatchesAll(t *testing.T) {
 
 func TestMatchesColumns(t *testing.T) {
 	a := Records{
-		Record{Id: "a0", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
-		Record{Id: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
-		Record{Id: "a2", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+		Record{ID: "a0", Atts: []Atter{TextAtt{"red"}, NumericAtt{1}}},
+		Record{ID: "a1", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{ID: "a2", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
 	}
 	b := Records{
-		Record{Id: "b0", Atts: []Atter{TextAtt{"green"}, NumericAtt{5}}},
-		Record{Id: "b1", Atts: []Atter{TextAtt{"red"}, NumericAtt{25}}},
-		Record{Id: "b2", Atts: []Atter{TextAtt{"red"}, NumericAtt{35}}},
-		Record{Id: "b3", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
-		Record{Id: "b4", Atts: []Atter{TextAtt{"green"}, NumericAtt{31}}},
-		Record{Id: "b5", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
-		Record{Id: "b6", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{ID: "b0", Atts: []Atter{TextAtt{"green"}, NumericAtt{5}}},
+		Record{ID: "b1", Atts: []Atter{TextAtt{"red"}, NumericAtt{25}}},
+		Record{ID: "b2", Atts: []Atter{TextAtt{"red"}, NumericAtt{35}}},
+		Record{ID: "b3", Atts: []Atter{TextAtt{"green"}, NumericAtt{30}}},
+		Record{ID: "b4", Atts: []Atter{TextAtt{"green"}, NumericAtt{31}}},
+		Record{ID: "b5", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
+		Record{ID: "b6", Atts: []Atter{TextAtt{"red"}, NumericAtt{20}}},
 	}
 
 	c := []int{10}

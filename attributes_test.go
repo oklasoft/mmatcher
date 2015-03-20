@@ -2,9 +2,12 @@
 // Use of this code is governed by a 3 clause BSD style license
 // Full license details in LICENSE file distributed with this software
 
-import "testing"
+package mmatcher_test
 
-import . "github.com/oklasoft/mmatcher"
+import (
+	. "github.com/oklasoft/mmatcher"
+	"testing"
+)
 
 func TestTextAttsEqual(t *testing.T) {
 	ta := TextAtt{"hi"}
