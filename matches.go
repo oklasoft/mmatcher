@@ -4,6 +4,8 @@
 
 package mmatcher
 
+import "math"
+
 //A Pair is the basic thing that makes up a match
 type Pair struct {
 	a string
@@ -59,6 +61,8 @@ func (m *MatchSet) AddPair(p Pair) {
 }
 
 //RemovePair takes a pair of matched items out of the collection if its there
+func (m *MatchSet) RemovePair(p Pair) {
+	m.delete(p.a, p.b)
 	m.delete(p.b, p.a)
 }
 
@@ -91,10 +95,6 @@ func (m *MatchSet) NumPairs() (l int) {
 	return l / 2
 }
 
-//QuantityOptimized returns an optimized matchset containing only a single
-//pair per item. It attempts to get the largest number of possible pairs without
-//duplicating any single item
-func (m *MatchSet) QuantityOptimized() (n MatchSet) {
 func (m *MatchSet) fewestPairs() (t string) {
 	min := math.MaxInt32
 	for k, v := range m.pairs {
@@ -117,5 +117,19 @@ func (m *MatchSet) mostPairsOf(t []string) (r string) {
 	return
 }
 
+//QuantityOptimized returns an optimized matchset containing only a single
+//pair per item. It attempts to get the largest number of possible pairs without
+//duplicating any single item
+func (m *MatchSet) QuantityOptimized() (n MatchSet) {
+	n = NewMatchSet()
+	if 0 == m.NumPairs() {
+		return
+	}
+	c := m.Copy()
+	a := c.fewestPairs()
+	b := c.mostPairsOf(m.pairs[a])
+	c.Purge(a)
+	c.Purge(b)
+	n.AddPair(NewPair(a, b))
 	return
 }
