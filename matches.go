@@ -49,6 +49,8 @@ func (m *MatchSet) Copy() (n MatchSet) {
 
 //NewMatchSet creates a new MatchSet collection
 func NewMatchSet() MatchSet {
+	return MatchSet{make(map[string]matches)}
+}
 
 //AddPair adds a new pair of matched items to the collection
 func (m *MatchSet) AddPair(p Pair) {
@@ -57,8 +59,6 @@ func (m *MatchSet) AddPair(p Pair) {
 }
 
 //RemovePair takes a pair of matched items out of the collection if its there
-func (m *MatchSet) RemovePair(p Pair) {
-	m.delete(p.a, p.b)
 	m.delete(p.b, p.a)
 }
 
@@ -95,5 +95,27 @@ func (m *MatchSet) NumPairs() (l int) {
 //pair per item. It attempts to get the largest number of possible pairs without
 //duplicating any single item
 func (m *MatchSet) QuantityOptimized() (n MatchSet) {
+func (m *MatchSet) fewestPairs() (t string) {
+	min := math.MaxInt32
+	for k, v := range m.pairs {
+		if len(v) < min {
+			t = k
+			min = len(v)
+		}
+	}
+	return
+}
+
+func (m *MatchSet) mostPairsOf(t []string) (r string) {
+	max := 0
+	for _, p := range t {
+		if len(m.pairs[p]) > max {
+			max = len(m.pairs[p])
+			r = p
+		}
+	}
+	return
+}
+
 	return
 }
