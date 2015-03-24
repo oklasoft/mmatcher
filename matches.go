@@ -117,6 +117,12 @@ func (m *MatchSet) mostPairsOf(t []string) (r string) {
 	return
 }
 
+func (m *MatchSet) minMaxPair() (p Pair) {
+	p.a = m.fewestPairs()
+	p.b = m.mostPairsOf(m.pairs[p.a])
+	return p
+}
+
 //QuantityOptimized returns an optimized matchset containing only a single
 //pair per item. It attempts to get the largest number of possible pairs without
 //duplicating any single item
@@ -126,10 +132,10 @@ func (m *MatchSet) QuantityOptimized() (n MatchSet) {
 		return
 	}
 	c := m.Copy()
-	a := c.fewestPairs()
-	b := c.mostPairsOf(m.pairs[a])
-	c.Purge(a)
-	c.Purge(b)
-	n.AddPair(NewPair(a, b))
+	for p := c.minMaxPair(); "" != p.a && "" != p.b; p = c.minMaxPair() {
+		c.Purge(p.a)
+		c.Purge(p.b)
+		n.AddPair(p)
+	}
 	return
 }
