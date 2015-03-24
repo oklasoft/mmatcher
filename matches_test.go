@@ -1,0 +1,74 @@
+package mmatcher_test
+
+import (
+	"testing"
+
+	. "github.com/oklasoft/mmatcher"
+)
+
+func TestPair(t *testing.T) {
+	a := NewPair("A1", "B1")
+	b := NewPair("A2", "B2")
+	c := NewPair("B1", "A1")
+	if a.Eql(b) {
+		t.Error(a, "not expected to equal", b)
+	}
+	if !a.Eql(c) {
+		t.Error(a, "expected to equal", c)
+	}
+}
+
+func TestAddRemove(t *testing.T) {
+	m := NewMatchSet()
+	if 0 != m.NumPairs() {
+		t.Error("A new set should be empty, but got", m.NumPairs())
+	}
+
+	m.AddPair(NewPair("A1", "B1"))
+	if 1 != m.NumPairs() {
+		t.Error("Length expected to be 1, but got", m.NumPairs())
+	}
+
+	m.AddPair(NewPair("A1", "B2"))
+	if 2 != m.NumPairs() {
+		t.Error("Length expected to be 2, but got", m.NumPairs())
+	}
+	m.AddPair(NewPair("A1", "B3"))
+	m.AddPair(NewPair("A2", "B2"))
+	m.AddPair(NewPair("A2", "B3"))
+	m.AddPair(NewPair("A3", "B1"))
+	m.AddPair(NewPair("A3", "B2"))
+
+	if 7 != m.NumPairs() {
+		t.Error("Length expected to be 7, but got", m.NumPairs())
+	}
+
+	m.RemovePair(NewPair("A2", "B2"))
+	if 6 != m.NumPairs() {
+		t.Error("Afer Removing 1, length should be 6, but was", m.NumPairs(), "in", m)
+	}
+	m.RemovePair(NewPair("A1", "B1"))
+	if 5 != m.NumPairs() {
+		t.Error("Afer Removing 2, length should be 5, but was", m.NumPairs(), "in", m)
+	}
+	m.RemovePair(NewPair("A3", "B2"))
+	if 4 != m.NumPairs() {
+		t.Error("Afer Removing 3, length should be 4, but was", m.NumPairs(), "in", m)
+	}
+	m.RemovePair(NewPair("X3", "X2"))
+	if 4 != m.NumPairs() {
+		t.Error("After removing a non existent the size should still be 4", m.NumPairs(), "in", m)
+	}
+	m.RemovePair(NewPair("A1", "X2"))
+	if 4 != m.NumPairs() {
+		t.Error("After removing a non existent the size should still be 4", m.NumPairs(), "in", m)
+	}
+	m.RemovePair(NewPair("B3", "A2"))
+	if 3 != m.NumPairs() {
+		t.Error("After removing a pair in oppopsite order there should be 3, but there were", m.NumPairs(), "in", m)
+	}
+	m.Purge("A1")
+	if 1 != m.NumPairs() {
+		t.Error("After a purge of A3, we should have only 1 left, but was", m.NumPairs(), "in", m)
+	}
+}
