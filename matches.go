@@ -37,10 +37,18 @@ type MatchSet struct {
 	pairs map[string]matches
 }
 
+//Copy returns a new copy of the MatchSet
+func (m *MatchSet) Copy() (n MatchSet) {
+	n = NewMatchSet()
+	for k, v := range m.pairs {
+		n.pairs[k] = make([]string, len(v))
+		copy(n.pairs[k], v)
+	}
+	return
+}
+
 //NewMatchSet creates a new MatchSet collection
 func NewMatchSet() MatchSet {
-	return MatchSet{make(map[string]matches)}
-}
 
 //AddPair adds a new pair of matched items to the collection
 func (m *MatchSet) AddPair(p Pair) {
