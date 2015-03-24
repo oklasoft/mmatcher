@@ -72,3 +72,22 @@ func TestAddRemove(t *testing.T) {
 		t.Error("After a purge of A3, we should have only 1 left, but was", m.NumPairs(), "in", m)
 	}
 }
+
+func TestQuantityOptimize(t *testing.T) {
+	m := NewMatchSet()
+	m.AddPair(NewPair("A1", "B1"))
+	m.AddPair(NewPair("A1", "B2"))
+	m.AddPair(NewPair("A1", "B3"))
+	m.AddPair(NewPair("A2", "B2"))
+	m.AddPair(NewPair("A2", "B3"))
+	m.AddPair(NewPair("A3", "B1"))
+	m.AddPair(NewPair("A3", "B2"))
+
+	o := m.QuantityOptimized()
+	if 3 != o.NumPairs() {
+		t.Error("After optimizing we should have 3, but we had", o.NumPairs(), "in", o)
+	}
+	if 7 != m.NumPairs() {
+		t.Error("After making the optimized set, the original should be the same size still", m)
+	}
+}
