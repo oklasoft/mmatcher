@@ -67,12 +67,14 @@ func (a *Record) isMatchAt(b *Record, e Atter, i int) bool {
 // Records is just a slice of Record types
 type Records []Record
 
+//NewRecordsFromCSV parses an CSV formatted io.Reader to create
+//Records for matching
 func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
 	csv := csv.NewReader(in)
-	line_no := 0
+	lineno := 0
 
 	for {
-		line_no++
+		lineno++
 		line, err := csv.Read()
 		if io.EOF == err {
 			err = nil
@@ -80,7 +82,7 @@ func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
 		} else if nil != err {
 			return nil, err
 		}
-		if 1 == line_no {
+		if 1 == lineno {
 			continue //skip header
 		}
 		a := []Atter{}
