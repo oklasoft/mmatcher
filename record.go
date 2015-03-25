@@ -4,6 +4,11 @@
 
 package mmatcher
 
+import (
+	"encoding/csv"
+	"io"
+)
+
 // A Record holds a data to be matched based on attributes in Atts
 type Record struct {
 	ID   string
@@ -61,6 +66,32 @@ func (a *Record) isMatchAt(b *Record, e Atter, i int) bool {
 
 // Records is just a slice of Record types
 type Records []Record
+
+func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
+	csv := csv.NewReader(in)
+	line_no := 0
+
+	for {
+		line_no++
+		line, err := csv.Read()
+		if io.EOF == err {
+			err = nil
+			break
+		} else if nil != err {
+			return nil, err
+		}
+		if 1 == line_no {
+			continue //skip header
+		}
+		a := []Atter{}
+		for _, v := range line[1:] {
+			a = append(a, TextAtt{v})
+		}
+		r = append(r, Record{ID: line[0], Atts: a})
+	}
+
+	return r, nil
+}
 
 // MatchesAll returns a slice containing the indices of r that match to a with
 // the given +/- ranges in e

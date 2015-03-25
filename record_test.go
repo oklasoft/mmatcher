@@ -4,7 +4,10 @@
 
 package mmatcher
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestMatch(t *testing.T) {
 	a := &Record{ID: "a", Atts: []Atter{TextAtt{"text"}, NumericAtt{1}, TextAtt{"green"}}}
@@ -236,5 +239,29 @@ func TestMatchesColumns(t *testing.T) {
 	m = a[2].Matches(b, c, e...)
 	if 4 != len(m) {
 		t.Errorf("%v should have found 4 in %v using %v, but found %v", a[0], b, e, m)
+	}
+}
+
+func TestCSVParsing(t *testing.T) {
+	csv := `item,type,color,count
+a1,m,red,25`
+	r, err := NewRecordsFromCSV(strings.NewReader(csv))
+	if err != nil {
+		t.Error("Expected no error parsing, but got ", err)
+	}
+	if 1 != len(r) {
+		t.Error("Expected 1 record from", r)
+	}
+	if 3 != len(r[0].Atts) {
+		t.Error("Expedted 3 attributes from", r[0].Atts)
+	}
+
+	csv = "item,type,color,count"
+	r, err = NewRecordsFromCSV(strings.NewReader(csv))
+	if err != nil {
+		t.Error("Expected no error parsing, but got ", err)
+	}
+	if 0 != len(r) {
+		t.Error("Expected 0 record from", r)
 	}
 }
