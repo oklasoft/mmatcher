@@ -256,6 +256,20 @@ a1,m,red,25`
 		t.Error("Expedted 3 attributes from", r[0].Atts)
 	}
 
+	csv = `item,type,color,count
+a1,f,red,15
+a2,m,red,25`
+	r, err = NewRecordsFromCSV(strings.NewReader(csv), 2)
+	if err != nil {
+		t.Error("Expected no error parsing, but got ", err)
+	}
+	if 2 != len(r) {
+		t.Error("Expected 1 record from", r)
+	}
+	if !(NumericAtt{15}).Equal(r[0].Atts[2], NumericAtt{}) {
+		t.Error("Expected last attribute to be numeric equal to 15, but was not in", r[0].Atts[2])
+	}
+
 	csv = "item,type,color,count"
 	r, err = NewRecordsFromCSV(strings.NewReader(csv))
 	if err != nil {
