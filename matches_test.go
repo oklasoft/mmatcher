@@ -77,10 +77,22 @@ func TestQuantityOptimize(t *testing.T) {
 	m := NewMatchSet()
 	m.AddPair(NewPair("A1", "B1"))
 	m.AddPair(NewPair("A1", "B2"))
+	if o := m.QuantityOptimized(); 1 != o.NumPairs() {
+		t.Error("Expected only 1 optimized pair from 2 pairs with 3 samples, got", o)
+	}
 	m.AddPair(NewPair("A1", "B3"))
 	m.AddPair(NewPair("A2", "B2"))
+	if o := m.QuantityOptimized(); 2 != o.NumPairs() {
+		t.Error("Expected 2 optimized pairs from 4 pairs with 4 samples, got", o)
+	}
 	m.AddPair(NewPair("A2", "B3"))
+	if o := m.QuantityOptimized(); 2 != o.NumPairs() {
+		t.Error("Expected 2 optimized pairs from 4 pairs with 5 samples, got", o)
+	}
 	m.AddPair(NewPair("A3", "B1"))
+	if o := m.QuantityOptimized(); 3 != o.NumPairs() {
+		t.Error("Expected 3 optimized pairs, got", o)
+	}
 	m.AddPair(NewPair("A3", "B2"))
 
 	o := m.QuantityOptimized()
