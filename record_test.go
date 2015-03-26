@@ -270,6 +270,14 @@ a2,m,red,25`
 		t.Error("Expected last attribute to be numeric equal to 15, but was not in", r[0].Atts[2])
 	}
 
+	r, err = NewRecordsFromCSV(strings.NewReader(csv), 0)
+	if err == nil {
+		t.Error("Expect error parsing, but got ", err)
+	}
+	if 0 != len(r) {
+		t.Error("Expected 0 record from", r)
+	}
+
 	csv = "item,type,color,count"
 	r, err = NewRecordsFromCSV(strings.NewReader(csv))
 	if err != nil {
