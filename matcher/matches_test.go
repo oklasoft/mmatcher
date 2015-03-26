@@ -110,3 +110,22 @@ func TestQuantityOptimize(t *testing.T) {
 		t.Error("After making the optimized set, the original should be the same size still", m)
 	}
 }
+
+func TestMatchesFor(t *testing.T) {
+	m := NewMatchSet()
+	m.AddPair(NewPair("A1", "B1"))
+	if o := m.MatchesFor("A1"); 1 != len(o) || "B1" != o[0] {
+		t.Error("After only one pair expected a single MatchFor back, but got", o)
+	}
+	m.AddPair(NewPair("A1", "B2"))
+	if o := m.MatchesFor("A1"); 2 != len(o) || "B2" != o[1] {
+		t.Error("After two pair expected two MatchFor back, but got", o)
+	}
+	m.AddPair(NewPair("A2", "B2"))
+	if o := m.MatchesFor("B1"); 1 != len(o) || "A1" != o[0] {
+		t.Error("Expected one back when going in reverse direction as well, but was", o)
+	}
+	if o := m.MatchesFor("A3"); 0 != len(o) {
+		t.Error("Expected an empty match back for non existent sample", o)
+	}
+}

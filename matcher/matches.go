@@ -139,3 +139,10 @@ func (m *MatchSet) QuantityOptimized() (n MatchSet) {
 	}
 	return
 }
+
+//MatchesFor returns the slice of matches for given identifeir.
+func (m *MatchSet) MatchesFor(t string) (r matches) {
+	r = make(matches, len(m.pairs[t]))
+	copy(r, m.pairs[t])
+	return r
+}
