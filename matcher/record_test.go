@@ -264,7 +264,7 @@ a2,m,red,25`
 		t.Error("Expected no error parsing, but got ", err)
 	}
 	if 2 != len(r) {
-		t.Error("Expected 1 record from", r)
+		t.Error("Expected 2 record from", r)
 	}
 	if !(NumericAtt{15}).Equal(r[0].Atts[2], NumericAtt{}) {
 		t.Error("Expected last attribute to be numeric equal to 15, but was not in", r[0].Atts[2])
