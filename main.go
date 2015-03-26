@@ -5,9 +5,11 @@
 package main
 
 import (
-	"github.com/oklasoft/mmatcher/matcher"
+	"encoding/csv"
 	"log"
 	"os"
+
+	"github.com/oklasoft/mmatcher/matcher"
 )
 
 func main() {
@@ -46,5 +48,17 @@ func main() {
 	opti := all_matches.QuantityOptimized()
 
 	log.Print("After optimizing we got:", opti)
+
+	out := csv.NewWriter(os.Stdout)
+	out.Write([]string{"case", "control"})
+
+	for _, r := range cases {
+		m := opti.MatchesFor(r.ID)
+		if 0 == len(m) {
+			continue
+		}
+		out.Write([]string{r.ID, m[0]})
+	}
+	out.Flush()
 
 }
