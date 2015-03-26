@@ -2,7 +2,7 @@
 // Use of this code is governed by a 3 clause BSD style license
 // Full license details in LICENSE file distributed with this software
 
-package mmatcher
+package matcher
 
 import (
 	"encoding/csv"

@@ -2,12 +2,12 @@
 // Use of this code is governed by a 3 clause BSD style license
 // Full license details in LICENSE file distributed with this software
 
-package mmatcher_test
+package matcher_test
 
 import (
 	"testing"
 
-	. "github.com/oklasoft/mmatcher"
+	. "github.com/oklasoft/mmatcher/matcher"
 )
 
 func TestPair(t *testing.T) {
