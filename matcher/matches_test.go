@@ -1,3 +1,7 @@
+// Copyright 2015 Stuart Glenn, OMRF. All rights reserved.
+// Use of this code is governed by a 3 clause BSD style license
+// Full license details in LICENSE file distributed with this software
+
 package mmatcher_test
 
 import (
