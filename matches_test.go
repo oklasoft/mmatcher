@@ -75,6 +75,9 @@ func TestAddRemove(t *testing.T) {
 
 func TestQuantityOptimize(t *testing.T) {
 	m := NewMatchSet()
+	if o := m.QuantityOptimized(); 0 != o.NumPairs() {
+		t.Error("Expected an empty set of matches from an empty matchset", o)
+	}
 	m.AddPair(NewPair("A1", "B1"))
 	m.AddPair(NewPair("A1", "B2"))
 	if o := m.QuantityOptimized(); 1 != o.NumPairs() {
