@@ -69,16 +69,12 @@ func (a *Record) isMatchAt(b *Record, e Atter, i int) bool {
 type Records []Record
 
 //NewRecordsFromCSV parses an CSV formatted io.Reader to create
-//Records for matching, nums is used to specify with indices (starting at 0)
-//of the columns of attributes should be created as Numerics
+//Records for matching. We assume the first line is a header row which
+//is skipped.
 //TODO we should make this more robust with checking number of columns etc
-func NewRecordsFromCSV(in io.Reader, nums ...int) (r Records, err error) {
+func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
 	csv := csv.NewReader(in)
 	lineno := 0
-	numerics := make(map[int]bool)
-	for _, v := range nums {
-		numerics[v] = true
-	}
 
 	for {
 		lineno++
@@ -93,12 +89,9 @@ func NewRecordsFromCSV(in io.Reader, nums ...int) (r Records, err error) {
 			continue //skip header
 		}
 		a := []Atter{}
-		for i, v := range line[1:] {
-			if _, ok := numerics[i]; ok {
-				n, err := strconv.ParseFloat(v, 64)
-				if nil != err {
-					return nil, err
-				}
+		for _, v := range line[1:] {
+			n, err := strconv.ParseFloat(v, 64)
+			if nil == err {
 				a = append(a, NumericAtt{n})
 			} else {
 				a = append(a, TextAtt{v})

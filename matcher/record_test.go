@@ -259,7 +259,7 @@ a1,m,red,25`
 	csv = `item,type,color,count
 a1,f,red,15
 a2,m,red,25`
-	r, err = NewRecordsFromCSV(strings.NewReader(csv), 2)
+	r, err = NewRecordsFromCSV(strings.NewReader(csv))
 	if err != nil {
 		t.Error("Expected no error parsing, but got ", err)
 	}
@@ -268,14 +268,6 @@ a2,m,red,25`
 	}
 	if !(NumericAtt{15}).Equal(r[0].Atts[2], NumericAtt{}) {
 		t.Error("Expected last attribute to be numeric equal to 15, but was not in", r[0].Atts[2])
-	}
-
-	r, err = NewRecordsFromCSV(strings.NewReader(csv), 0)
-	if err == nil {
-		t.Error("Expect error parsing, but got ", err)
-	}
-	if 0 != len(r) {
-		t.Error("Expected 0 record from", r)
 	}
 
 	csv = "item,type,color,count"
