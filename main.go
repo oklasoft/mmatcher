@@ -52,8 +52,6 @@ func parseKeys(s string) ([]int, []matcher.Atter) {
 
 func main() {
 	positions, ranges := parseKeys(os.Args[1])
-	log.Print(positions)
-	log.Print(ranges)
 	cases := loadData(os.Args[2])
 	controls := loadData(os.Args[3])
 
