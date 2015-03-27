@@ -19,8 +19,10 @@ func main() {
 	}
 	defer case_file.Close()
 
-	cases, err := matcher.NewRecordsFromCSV(case_file, 2)
-	log.Print("Read cases:", cases)
+	cases, err := matcher.NewRecordsFromCSV(case_file)
+	if nil != err {
+		log.Fatal(err)
+	}
 
 	control_file, err := os.Open(os.Args[2])
 	if nil != err {
@@ -28,8 +30,10 @@ func main() {
 	}
 	defer control_file.Close()
 
-	controls, err := matcher.NewRecordsFromCSV(control_file, 2)
-	log.Print("Read controls:", controls)
+	controls, err := matcher.NewRecordsFromCSV(control_file)
+	if nil != err {
+		log.Fatal(err)
+	}
 
 	all_matches := matcher.NewMatchSet()
 
