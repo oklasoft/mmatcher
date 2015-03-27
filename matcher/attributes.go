@@ -13,6 +13,7 @@ import (
 // possible mixed string & numerics
 type Atter interface {
 	Equal(Atter, Atter) bool
+	String() string
 }
 
 // A TextAtt is to store & compare string values for a Record
@@ -47,4 +48,8 @@ func (a NumericAtt) Equal(b Atter, e Atter) bool {
 
 func (a NumericAtt) String() string {
 	return fmt.Sprintf("%v", a.Val)
+}
+
+func (a TextAtt) String() string {
+	return a.Val
 }
