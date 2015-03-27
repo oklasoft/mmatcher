@@ -24,7 +24,7 @@ func (a *Record) IsMatch(b *Record, positions ...int) bool {
 			positions[i] = i
 		}
 	}
-	e := make([]Atter, len(a.Atts))
+	e := make([]Atter, len(positions))
 	return a.IsMatchWithRanges(b, e, positions...)
 }
 
@@ -32,7 +32,7 @@ func (a *Record) IsMatch(b *Record, positions ...int) bool {
 // positions. e is a slice of Atters to use for +/- range comparisons in columns
 // of the same index
 func (a *Record) IsMatchWithRanges(b *Record, e []Atter, positions ...int) bool {
-	if len(a.Atts) != len(b.Atts) || len(e) != len(a.Atts) {
+	if len(a.Atts) != len(b.Atts) {
 		return false
 	}
 	if len(positions) <= 0 {
@@ -41,12 +41,12 @@ func (a *Record) IsMatchWithRanges(b *Record, e []Atter, positions ...int) bool 
 			positions[i] = i
 		}
 	}
+	if len(positions) > len(e) {
+		return false
+	}
 	matches := make([]bool, len(positions))
 	for i, n := range positions {
-		if n >= len(a.Atts) {
-			return false
-		}
-		matches[i] = a.isMatchAt(b, e[n], n)
+		matches[i] = a.isMatchAt(b, e[i], n)
 	}
 	for _, m := range matches {
 		if !m {
@@ -117,7 +117,7 @@ func (a *Record) MatchesAll(r Records, e ...Atter) []int {
 // attributes in positions with any given +/- ranges in e
 func (a *Record) Matches(r Records, positions []int, e ...Atter) (matches []int) {
 	if len(e) <= 0 {
-		e = make([]Atter, len(a.Atts))
+		e = make([]Atter, len(positions))
 	}
 	for i, b := range r {
 		if a.IsMatchWithRanges(&b, e, positions...) {
