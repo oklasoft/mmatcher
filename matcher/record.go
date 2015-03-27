@@ -103,6 +103,15 @@ func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
 	return r, nil
 }
 
+func (r *Records) Get(t string) Record {
+	for _, v := range *r {
+		if v.ID == t {
+			return v
+		}
+	}
+	return Record{}
+}
+
 // MatchesAll returns a slice containing the indices of r that match to a with
 // the given +/- ranges in e
 func (a *Record) MatchesAll(r Records, e ...Atter) []int {
