@@ -71,9 +71,24 @@ func TestAddRemove(t *testing.T) {
 	if 3 != m.NumPairs() {
 		t.Error("After removing a pair in oppopsite order there should be 3, but there were", m.NumPairs(), "in", m)
 	}
+}
+
+func TestPurge(t *testing.T) {
+	m := NewMatchSet()
+	m.AddPair(NewPair("A1", "B1"))
+	m.AddPair(NewPair("A1", "B2"))
+	m.AddPair(NewPair("A1", "B3"))
+	m.AddPair(NewPair("A2", "B2"))
+	m.AddPair(NewPair("A2", "B3"))
+	m.AddPair(NewPair("A3", "B1"))
+	m.AddPair(NewPair("A3", "B2"))
+	m.Purge("B2")
+	if 4 != m.NumPairs() {
+		t.Error("After a purge of B2, we should have only 4 left, but was", m.NumPairs(), "in", m)
+	}
 	m.Purge("A1")
-	if 1 != m.NumPairs() {
-		t.Error("After a purge of A3, we should have only 1 left, but was", m.NumPairs(), "in", m)
+	if 2 != m.NumPairs() {
+		t.Error("After another purge of A1, we should have only 2 left, but was", m.NumPairs(), "in", m)
 	}
 }
 
