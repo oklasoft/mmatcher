@@ -70,7 +70,10 @@ func (m *MatchSet) RemovePair(p Pair) {
 func (m *MatchSet) Purge(i string) {
 	if v, ok := m.pairs[i]; ok {
 		for _, b := range v {
-			m.RemovePair(NewPair(i, b))
+			//defer used, since RemovePair will alter the slice v & its range
+			//this can lead to items being NOT purged, with defer we make sure
+			//we loop through all the items. Defer used in place of copying v for "fun"
+			defer m.RemovePair(NewPair(i, b))
 		}
 	}
 }
