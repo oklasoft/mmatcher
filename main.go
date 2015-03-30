@@ -58,7 +58,7 @@ func version() string {
 
 var (
 	verbose      = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
-	key          = kingpin.Arg("keys", "Keys to compare").Required().String()
+	key          = kingpin.Arg("keys", "Keys to compare. A comma separated list of columns starting a 1, with optional :# +/- window").Required().String()
 	case_file    = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
 	control_file = kingpin.Arg("controls", "CSV file representing the controls").Required().ExistingFile()
 	build        string
