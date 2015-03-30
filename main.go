@@ -58,6 +58,7 @@ func version() string {
 
 var (
 	verbose      = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
+	outFile      = kingpin.Flag("output", "Output file").Short('o').PlaceHolder("STDOUT").OpenFile(os.O_WRONLY|os.O_CREATE, 0660)
 	key          = kingpin.Arg("keys", "Keys to compare. A comma separated list of columns starting a 1, with optional :# +/- window").Required().String()
 	case_file    = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
 	control_file = kingpin.Arg("controls", "CSV file representing the controls").Required().ExistingFile()
@@ -67,6 +68,10 @@ var (
 func main() {
 	kingpin.Version(version())
 	kingpin.Parse()
+
+	if nil == *outFile {
+		outFile = &os.Stdout
+	}
 
 	positions, ranges := parseKeys(*key)
 	cases := loadData(*case_file)
@@ -83,7 +88,7 @@ func main() {
 
 	opti := all_matches.QuantityOptimized()
 
-	out := csv.NewWriter(os.Stdout)
+	out := csv.NewWriter(*outFile)
 	out.Write([]string{"case", "control"})
 
 	for _, r := range cases {
@@ -102,5 +107,6 @@ func main() {
 		out.Write(line)
 	}
 	out.Flush()
+	(*outFile).Close()
 
 }
