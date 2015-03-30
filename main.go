@@ -6,12 +6,14 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/oklasoft/mmatcher/matcher"
+	"gopkg.in/alecthomas/kingpin.v1"
 )
 
 func loadData(path string) matcher.Records {
@@ -50,10 +52,25 @@ func parseKeys(s string) ([]int, []matcher.Atter) {
 	return positions, ranges
 }
 
+func version() string {
+	return fmt.Sprintf("mmatcher - Multi Matcher 0.0.1 (20150330 %s)", build)
+}
+
+var (
+	verbose      = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
+	key          = kingpin.Arg("keys", "Keys to compare").Required().String()
+	case_file    = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
+	control_file = kingpin.Arg("controls", "CSV file representing the controls").Required().ExistingFile()
+	build        string
+)
+
 func main() {
-	positions, ranges := parseKeys(os.Args[1])
-	cases := loadData(os.Args[2])
-	controls := loadData(os.Args[3])
+	kingpin.Version(version())
+	kingpin.Parse()
+
+	positions, ranges := parseKeys(*key)
+	cases := loadData(*case_file)
+	controls := loadData(*control_file)
 
 	all_matches := matcher.NewMatchSet()
 
