@@ -92,10 +92,12 @@ func main() {
 			out.Write([]string{r.ID})
 			continue
 		}
-		control := controls.Get(m[0])
 		line := []string{r.ID, m[0]}
-		for _, p := range positions {
-			line = append(line, r.Atts[p].String(), control.Atts[p].String())
+		if *verbose {
+			control := controls.Get(m[0])
+			for _, p := range positions {
+				line = append(line, r.Atts[p].String(), control.Atts[p].String())
+			}
 		}
 		out.Write(line)
 	}
