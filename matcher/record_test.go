@@ -246,7 +246,7 @@ func TestMatchesColumns(t *testing.T) {
 func TestCSVParsing(t *testing.T) {
 	csv := `item,type,color,count
 a1,m,red,25`
-	r, err := NewRecordsFromCSV(strings.NewReader(csv))
+	r, err := NewRecordsFromCSV(strings.NewReader(csv), true)
 	if err != nil {
 		t.Error("Expected no error parsing, but got ", err)
 	}
@@ -260,7 +260,7 @@ a1,m,red,25`
 	csv = `item,type,color,count
 a1,f,red,15
 a2,m,red,25`
-	r, err = NewRecordsFromCSV(strings.NewReader(csv))
+	r, err = NewRecordsFromCSV(strings.NewReader(csv), true)
 	if err != nil {
 		t.Error("Expected no error parsing, but got ", err)
 	}
@@ -272,11 +272,18 @@ a2,m,red,25`
 	}
 
 	csv = "item,type,color,count"
-	r, err = NewRecordsFromCSV(strings.NewReader(csv))
+	r, err = NewRecordsFromCSV(strings.NewReader(csv), true)
 	if err != nil {
 		t.Error("Expected no error parsing, but got ", err)
 	}
 	if 0 != len(r) {
 		t.Error("Expected 0 record from", r)
+	}
+	r, err = NewRecordsFromCSV(strings.NewReader(csv), false)
+	if err != nil {
+		t.Error("Expected no error parsing, but got ", err)
+	}
+	if 1 != len(r) {
+		t.Error("Expected 1 record from", r)
 	}
 }

@@ -72,7 +72,7 @@ type Records []Record
 //Records for matching. We assume the first line is a header row which
 //is skipped.
 //TODO we should make this more robust with checking number of columns etc
-func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
+func NewRecordsFromCSV(in io.Reader, skipHeader bool) (r Records, err error) {
 	csv := csv.NewReader(in)
 	lineno := 0
 
@@ -85,7 +85,7 @@ func NewRecordsFromCSV(in io.Reader) (r Records, err error) {
 		} else if nil != err {
 			return nil, err
 		}
-		if 1 == lineno {
+		if skipHeader && 1 == lineno {
 			continue //skip header
 		}
 		a := []Atter{}

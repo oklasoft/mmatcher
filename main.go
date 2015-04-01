@@ -16,14 +16,14 @@ import (
 	"gopkg.in/alecthomas/kingpin.v1"
 )
 
-func loadData(path string) matcher.Records {
+func loadData(path string, skipHeader bool) matcher.Records {
 	file, err := os.Open(path)
 	if nil != err {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
-	data, err := matcher.NewRecordsFromCSV(file)
+	data, err := matcher.NewRecordsFromCSV(file, skipHeader)
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -58,6 +58,7 @@ func version() string {
 
 var (
 	verbose      = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
+	skipHeaders  = kingpin.Flag("skip-header", "Inputs have header line to be skipped, default is use everyline").Short('h').Bool()
 	outFile      = kingpin.Flag("output", "Output file").Short('o').PlaceHolder("STDOUT").OpenFile(os.O_WRONLY|os.O_CREATE, 0660)
 	key          = kingpin.Arg("keys", "Keys to compare. A comma separated list of columns starting a 1, with optional :# +/- window").Required().String()
 	case_file    = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
@@ -74,8 +75,8 @@ func main() {
 	}
 
 	positions, ranges := parseKeys(*key)
-	cases := loadData(*case_file)
-	controls := loadData(*control_file)
+	cases := loadData(*case_file, *skipHeaders)
+	controls := loadData(*control_file, *skipHeaders)
 
 	all_matches := matcher.NewMatchSet()
 
