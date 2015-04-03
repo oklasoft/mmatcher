@@ -5,6 +5,7 @@
 package matcher
 
 import (
+	"bufio"
 	"encoding/csv"
 	"io"
 	"strconv"
@@ -68,12 +69,45 @@ func (a *Record) isMatchAt(b *Record, e Atter, i int) bool {
 // Records is just a slice of Record types
 type Records []Record
 
+type crReader struct {
+	r *bufio.Reader
+}
+
+func newcrReader(r io.Reader) io.Reader {
+	return crReader{bufio.NewReader(r)}
+}
+
+func (r crReader) Read(b []byte) (int, error) {
+	n, err := r.r.Read(b)
+	if n <= 0 {
+		return n, err
+	}
+	b = b[:n]
+	for i := range b {
+		if b[i] == '\r' {
+			var next byte
+			if j := i + 1; j < len(b) {
+				next = b[j]
+			} else {
+				next, err = r.r.ReadByte()
+				if err == nil {
+					r.r.UnreadByte()
+				}
+			}
+			if next != '\n' {
+				b[i] = '\n'
+			}
+		}
+	}
+	return n, err
+}
+
 //NewRecordsFromCSV parses an CSV formatted io.Reader to create
 //Records for matching. We assume the first line is a header row which
 //is skipped.
 //TODO we should make this more robust with checking number of columns etc
 func NewRecordsFromCSV(in io.Reader, skipHeader bool) (r Records, err error) {
-	csv := csv.NewReader(in)
+	csv := csv.NewReader(newcrReader(in))
 	lineno := 0
 
 	for {
