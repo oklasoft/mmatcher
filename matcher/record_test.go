@@ -287,3 +287,29 @@ a2,m,red,25`
 		t.Error("Expected 1 record from", r)
 	}
 }
+
+func TestCSVParsingWithCR(t *testing.T) {
+	csv := "item,type,color,count\ra1,m,red,25\r"
+	r, err := NewRecordsFromCSV(strings.NewReader(csv), true)
+	if err != nil {
+		t.Error("Expected no error parsing, but got ", err)
+	}
+	if 1 != len(r) {
+		t.Fatal("Expected 1 record from", r, "in", csv)
+	}
+	if 3 != len(r[0].Atts) {
+		t.Error("Expedted 3 attributes from", r[0].Atts)
+	}
+
+	csv = "item,type,color,count\ra1,f,red,15\ra2,m,red,25"
+	r, err = NewRecordsFromCSV(strings.NewReader(csv), true)
+	if err != nil {
+		t.Fatal("Expected no error parsing, but got ", err)
+	}
+	if 2 != len(r) {
+		t.Fatal("Expected 2 record from", r)
+	}
+	if !(NumericAtt{15}).Equal(r[0].Atts[2], NumericAtt{}) {
+		t.Error("Expected last attribute to be numeric equal to 15, but was not in", r[0].Atts[2])
+	}
+}
