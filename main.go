@@ -60,6 +60,7 @@ var (
 	verbose      = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
 	skipHeaders  = kingpin.Flag("skip-header", "Inputs have header line to be skipped, default is use everyline").Short('h').Bool()
 	outFile      = kingpin.Flag("output", "Output file").Short('o').PlaceHolder("STDOUT").OpenFile(os.O_WRONLY|os.O_CREATE, 0660)
+	outSep       = kingpin.Flag("out-separator", "Output field separator").Default(",").String()
 	key          = kingpin.Arg("keys", "Keys to compare. A comma separated list of columns starting a 1, with optional :# +/- window").Required().String()
 	case_file    = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
 	control_file = kingpin.Arg("controls", "CSV file representing the controls").Required().ExistingFile()
@@ -90,6 +91,11 @@ func main() {
 	opti := all_matches.QuantityOptimized()
 
 	out := csv.NewWriter(*outFile)
+	sep, err := strconv.Unquote("'" + *outSep + "'")
+	if nil != err {
+		log.Fatal(err)
+	}
+	out.Comma = ([]rune(sep))[0]
 	out.Write([]string{"case", "control"})
 
 	for _, r := range cases {
