@@ -144,3 +144,54 @@ func TestMatchesFor(t *testing.T) {
 		t.Error("Expected an empty match back for non existent sample", o)
 	}
 }
+
+func TestMatchesOptimizedAllowN(t *testing.T) {
+	m := NewMatchSet()
+	m.AddPair(NewPair("a1", "b1"))
+	m.AddPair(NewPair("a1", "b2"))
+	m.AddPair(NewPair("a1", "b3"))
+	m.AddPair(NewPair("a1", "b4"))
+	m.AddPair(NewPair("a1", "b5"))
+	m.AddPair(NewPair("a2", "b2"))
+	m.AddPair(NewPair("a2", "b3"))
+	m.AddPair(NewPair("a2", "b4"))
+	m.AddPair(NewPair("a2", "b6"))
+	m.AddPair(NewPair("a3", "b3"))
+	m.AddPair(NewPair("a3", "b4"))
+	m.AddPair(NewPair("a3", "b6"))
+	m.AddPair(NewPair("a3", "b7"))
+	o := m.QuantityOptimized(1)
+	if 3 != o.NumPairs() {
+		t.Error("After basic optimize we should have 3 pairs, but had", o.NumPairs(), "in", o)
+	}
+	o = m.QuantityOptimized(0)
+	if 0 != o.NumPairs() {
+		t.Error("After 0 max optimize we should have 0 pairs, but had", o.NumPairs(), "in", o)
+	}
+	o = m.QuantityOptimized(3)
+	if 7 != o.NumPairs() {
+		t.Error("After 3 max optimize we should have 7 pairs, but had", o.NumPairs(), "in", o)
+	}
+	if len(o.MatchesFor("a2")) < 2 {
+		t.Error("Exected at least 2 back for a2 but got", len(o.MatchesFor("a2")), "in", o.MatchesFor("a2"), "from", o)
+	}
+	if len(o.MatchesFor("a3")) < 2 {
+		t.Error("Exected at least 2 back for a3 but got", len(o.MatchesFor("a3")), "in", o.MatchesFor("a3"), "from", o)
+	}
+	if len(o.MatchesFor("a1")) < 2 {
+		t.Error("Exected at least 2 back for a1 but got", len(o.MatchesFor("a1")), "in", o.MatchesFor("a1"), "from", o)
+	}
+	o = m.QuantityOptimized(2)
+	if 6 != o.NumPairs() {
+		t.Error("After 2 max optimize we should have 6 pairs, but had", o.NumPairs(), "in", o)
+	}
+	if len(o.MatchesFor("a1")) != 2 {
+		t.Error("Exected 2 back for a1 for", o)
+	}
+	if len(o.MatchesFor("a2")) != 2 {
+		t.Error("Exected 2 back for a2 for", o)
+	}
+	if len(o.MatchesFor("a3")) != 2 {
+		t.Error("Exected 2 back for a3 for", o)
+	}
+}
