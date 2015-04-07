@@ -57,14 +57,15 @@ func version() string {
 }
 
 var (
-	verbose      = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
-	skipHeaders  = kingpin.Flag("skip-header", "Inputs have header line to be skipped, default is use everyline").Short('h').Bool()
-	outFile      = kingpin.Flag("output", "Output file").Short('o').PlaceHolder("STDOUT").OpenFile(os.O_WRONLY|os.O_CREATE, 0660)
-	outSep       = kingpin.Flag("out-separator", "Output field separator").Default(",").String()
-	key          = kingpin.Arg("keys", "Keys to compare. A comma separated list of columns starting a 1, with optional :# +/- window").Required().String()
-	case_file    = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
-	control_file = kingpin.Arg("controls", "CSV file representing the controls").Required().ExistingFile()
-	build        string
+	verbose       = kingpin.Flag("verbose", "Increase verbosity").Short('v').Bool()
+	skipHeaders   = kingpin.Flag("skip-header", "Inputs have header line to be skipped, default is use everyline").Short('h').Bool()
+	outFile       = kingpin.Flag("output", "Output file").Short('o').PlaceHolder("STDOUT").OpenFile(os.O_WRONLY|os.O_CREATE, 0660)
+	numberMatches = kingpin.Flag("matches", "Allow up to N matches per case").Short('m').PlaceHolder("N").Default("1").Int()
+	outSep        = kingpin.Flag("out-separator", "Output field separator").Default(",").String()
+	key           = kingpin.Arg("keys", "Keys to compare. A comma separated list of columns starting a 1, with optional :# +/- window").Required().String()
+	case_file     = kingpin.Arg("case", "CSV file representing the cases").Required().ExistingFile()
+	control_file  = kingpin.Arg("controls", "CSV file representing the controls").Required().ExistingFile()
+	build         string
 )
 
 func main() {
@@ -88,7 +89,7 @@ func main() {
 		}
 	}
 
-	opti := all_matches.QuantityOptimized()
+	opti := all_matches.QuantityOptimized(*numberMatches)
 
 	out := csv.NewWriter(*outFile)
 	sep, err := strconv.Unquote("'" + *outSep + "'")
@@ -96,7 +97,11 @@ func main() {
 		log.Fatal(err)
 	}
 	out.Comma = ([]rune(sep))[0]
-	out.Write([]string{"case", "control"})
+	line := []string{"case"}
+	for i := 0; i < *numberMatches; i++ {
+		line = append(line, fmt.Sprintf("control %d", i+1))
+	}
+	out.Write(line)
 
 	for _, r := range cases {
 		m := opti.MatchesFor(r.ID)
@@ -104,11 +109,25 @@ func main() {
 			out.Write([]string{r.ID})
 			continue
 		}
-		line := []string{r.ID, m[0]}
+		line = []string{r.ID}
+		for i := 0; i < *numberMatches; i++ {
+			if i < len(m) {
+				line = append(line, m[i])
+			} else {
+				line = append(line, "")
+			}
+		}
 		if *verbose {
-			control := controls.Get(m[0])
 			for _, p := range positions {
-				line = append(line, r.Atts[p].String(), control.Atts[p].String())
+				line = append(line, r.Atts[p].String())
+				for i := 0; i < *numberMatches; i++ {
+					if i < len(m) {
+						control := controls.Get(m[i])
+						line = append(line, control.Atts[p].String())
+					} else {
+						line = append(line, "")
+					}
+				}
 			}
 		}
 		out.Write(line)
