@@ -4,7 +4,11 @@
 
 package matcher
 
-import "math"
+import (
+	"fmt"
+	"log"
+	"math"
+)
 
 //A Pair is the basic thing that makes up a match
 type Pair struct {
@@ -25,10 +29,6 @@ func (a Pair) Eql(b Pair) bool {
 
 type matches []string
 
-func (m matches) IndexOf(t string) int {
-	for i, v := range m {
-		if t == v {
-			return i
 type match struct {
 	m   matches
 	isA bool
@@ -65,6 +65,10 @@ func (m match) String() string {
 	return fmt.Sprintf("%v", m.m)
 }
 
+func (m matches) IndexOf(t string) int {
+	for i, v := range m {
+		if t == v {
+			return i
 		}
 	}
 	return -1
@@ -72,28 +76,43 @@ func (m match) String() string {
 
 //MatchSet represents a collection of Pairs more or less
 type MatchSet struct {
-	pairs map[string]matches
+	pairs map[string]*match
+}
+
+func (m MatchSet) String() (s string) {
+	for k, v := range m.pairs {
+		if v.isA {
+			s += fmt.Sprintf("%s(%t):%v ", k, v.isA, v.m)
+		}
+	}
+	return s
 }
 
 //Copy returns a new copy of the MatchSet
 func (m *MatchSet) Copy() (n MatchSet) {
 	n = NewMatchSet()
 	for k, v := range m.pairs {
-		n.pairs[k] = make([]string, len(v))
-		copy(n.pairs[k], v)
+		n.pairs[k] = v.copy()
 	}
 	return
 }
 
 //NewMatchSet creates a new MatchSet collection
 func NewMatchSet() MatchSet {
-	return MatchSet{make(map[string]matches)}
+	return MatchSet{make(map[string]*match)}
 }
 
 //AddPair adds a new pair of matched items to the collection
 func (m *MatchSet) AddPair(p Pair) {
-	m.pairs[p.a] = append(m.pairs[p.a], p.b)
-	m.pairs[p.b] = append(m.pairs[p.b], p.a)
+	if _, ok := m.pairs[p.a]; !ok {
+		m.pairs[p.a] = newMatch(0, true)
+	}
+	(m.pairs[p.a]).append(p.b)
+	(m.pairs[p.a]).isA = true
+	if _, ok := m.pairs[p.b]; !ok {
+		m.pairs[p.b] = newMatch(0, false)
+	}
+	(m.pairs[p.b]).append(p.a)
 }
 
 //RemovePair takes a pair of matched items out of the collection if its there
@@ -105,7 +124,7 @@ func (m *MatchSet) RemovePair(p Pair) {
 //Purge takes a single ID, then removes any and all Pairs that contain at least half of it
 func (m *MatchSet) Purge(i string) {
 	if v, ok := m.pairs[i]; ok {
-		for _, b := range v {
+		for _, b := range v.m {
 			//defer used, since RemovePair will alter the slice v & its range
 			//this can lead to items being NOT purged, with defer we make sure
 			//we loop through all the items. Defer used in place of copying v for "fun"
@@ -116,10 +135,8 @@ func (m *MatchSet) Purge(i string) {
 
 func (m *MatchSet) delete(a, b string) {
 	if v, ok := m.pairs[a]; ok {
-		i := v.IndexOf(b)
-		if i >= 0 {
-			m.pairs[a] = append(v[:i], v[i+1:]...)
-			if len(m.pairs[a]) <= 0 {
+		if v.delete(b) {
+			if v.len() <= 0 {
 				delete(m.pairs, a)
 			}
 		}
@@ -129,7 +146,7 @@ func (m *MatchSet) delete(a, b string) {
 //NumPairs returns the number of total pairs/matches in this collection
 func (m *MatchSet) NumPairs() (l int) {
 	for _, v := range m.pairs {
-		l += len(v)
+		l += v.len()
 	}
 	return l / 2
 }
@@ -137,19 +154,19 @@ func (m *MatchSet) NumPairs() (l int) {
 func (m *MatchSet) fewestPairs() (t string) {
 	min := math.MaxInt32
 	for k, v := range m.pairs {
-		if len(v) < min {
+		if v.len() < min {
 			t = k
-			min = len(v)
+			min = v.len()
 		}
 	}
 	return
 }
 
-func (m *MatchSet) mostPairsOf(t []string) (r string) {
+func (m *MatchSet) mostPairsOf(t matches) (r string) {
 	max := 0
 	for _, p := range t {
-		if len(m.pairs[p]) > max {
-			max = len(m.pairs[p])
+		if m.pairs[p].len() > max {
+			max = m.pairs[p].len()
 			r = p
 		}
 	}
@@ -158,30 +175,58 @@ func (m *MatchSet) mostPairsOf(t []string) (r string) {
 
 func (m *MatchSet) minMaxPair() (p Pair) {
 	p.a = m.fewestPairs()
-	p.b = m.mostPairsOf(m.pairs[p.a])
+	if "" != p.a {
+		p.b = m.mostPairsOf(m.pairs[p.a].m)
+	}
 	return p
 }
 
 //QuantityOptimized returns an optimized matchset containing only a single
 //pair per item. It attempts to get the largest number of possible pairs without
 //duplicating any single item
-func (m *MatchSet) QuantityOptimized() (n MatchSet) {
+func (m *MatchSet) QuantityOptimized(allowed ...int) (n MatchSet) {
+	if len(allowed) <= 0 {
+		allowed = []int{1}
+	}
 	n = NewMatchSet()
-	if 0 == m.NumPairs() {
+	if 0 == m.NumPairs() || allowed[0] <= 0 {
 		return
 	}
 	c := m.Copy()
+	nextSet := m.Copy()
 	for p := c.minMaxPair(); "" != p.a && "" != p.b; p = c.minMaxPair() {
+		if m.pairs[p.a].isA && m.pairs[p.b].isA {
+			log.Fatal("Both cannot be A")
+		} else if m.pairs[p.b].isA {
+			tmp := p.a
+			p.a = p.b
+			p.b = tmp
+		}
 		c.Purge(p.a)
 		c.Purge(p.b)
+		nextSet.Purge(p.b)
 		n.AddPair(p)
 	}
+	n.Add(nextSet.QuantityOptimized(allowed[0] - 1))
 	return
+}
+
+func (m *MatchSet) Add(b MatchSet) {
+	for k, v := range b.pairs {
+		if v.isA {
+			for _, p := range v.m {
+				m.AddPair(NewPair(k, p))
+			}
+		}
+	}
 }
 
 //MatchesFor returns a copy of the slice of matches for given identifeir.
 func (m *MatchSet) MatchesFor(t string) (r matches) {
-	r = make(matches, len(m.pairs[t]))
-	copy(r, m.pairs[t])
+	if v, ok := m.pairs[t]; ok {
+		r = make(matches, v.len())
+		copy(r, v.m)
+		return r
+	}
 	return r
 }
