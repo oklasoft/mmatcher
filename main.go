@@ -53,7 +53,7 @@ func parseKeys(s string) ([]int, []matcher.Atter) {
 }
 
 func version() string {
-	return fmt.Sprintf("mmatcher - Multi Matcher 0.7.0 (20150404 %s)", build)
+	return fmt.Sprintf("mmatcher - Multi Matcher 0.8.0 (20150407 %s)", build)
 }
 
 var (
