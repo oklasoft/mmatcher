@@ -29,6 +29,42 @@ func (m matches) IndexOf(t string) int {
 	for i, v := range m {
 		if t == v {
 			return i
+type match struct {
+	m   matches
+	isA bool
+}
+
+func newMatch(l int, is bool) *match {
+	return &match{m: make(matches, l), isA: is}
+}
+
+func (m *match) copy() *match {
+	m2 := newMatch(m.len(), m.isA)
+	copy(m2.m, m.m)
+	return m2
+}
+
+func (m *match) len() int {
+	return len(m.m)
+}
+
+func (m *match) append(b string) {
+	m.m = append(m.m, b)
+}
+
+func (m *match) delete(b string) bool {
+	i := m.m.IndexOf(b)
+	if i >= 0 {
+		m.m = append(m.m[:i], m.m[i+1:]...)
+		return true
+	}
+	return false
+}
+
+func (m match) String() string {
+	return fmt.Sprintf("%v", m.m)
+}
+
 		}
 	}
 	return -1
