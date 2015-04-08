@@ -24,7 +24,7 @@ mmatcher --help
 
 ### Pre built binaries
 
-If you trust me to build your binary for you the [releases](/releases) section has the
+If you trust me to build your binary for you the [releases](/oklasoft/mmatcher/releases) section has the
 latest build for linux, mac & windows
 
 ## Usage
