@@ -33,9 +33,6 @@ func (a *Record) IsMatch(b *Record, positions ...int) bool {
 // positions. e is a slice of Atters to use for +/- range comparisons in columns
 // of the same index
 func (a *Record) IsMatchWithRanges(b *Record, e []Atter, positions ...int) bool {
-	if len(a.Atts) != len(b.Atts) {
-		return false
-	}
 	if len(positions) <= 0 {
 		positions = make([]int, len(a.Atts))
 		for i := range positions {
